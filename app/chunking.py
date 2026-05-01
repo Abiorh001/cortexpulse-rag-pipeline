@@ -16,7 +16,10 @@ def split_articles(articles: list[Article], settings: Settings) -> list[ArticleC
 
     chunks: list[ArticleChunk] = []
     for article in articles:
-        for index, text in enumerate(splitter.split_text(article.body)):
+        for index, raw_text in enumerate(splitter.split_text(article.body)):
+            text = clean_chunk_text(raw_text)
+            if not text:
+                continue
             chunk_id = stable_chunk_id(article.id, index, text)
             chunks.append(
                 ArticleChunk(
@@ -37,3 +40,7 @@ def split_articles(articles: list[Article], settings: Settings) -> list[ArticleC
 def stable_chunk_id(article_id: str, index: int, text: str) -> str:
     digest = sha256(f"{article_id}:{index}:{text}".encode("utf-8")).hexdigest()
     return str(uuid5(NAMESPACE_URL, digest))
+
+
+def clean_chunk_text(text: str) -> str:
+    return text.strip().lstrip(".;:- ").strip()

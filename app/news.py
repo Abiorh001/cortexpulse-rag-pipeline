@@ -33,6 +33,7 @@ async def fetch_guardian_articles(settings: Settings) -> list[Article]:
         "show-fields": "bodyText,headline,trailText",
         "order-by": "newest",
         "page-size": settings.max_articles,
+        "type": "article",
     }
 
     breaker = CircuitBreaker(
@@ -65,13 +66,15 @@ async def fetch_guardian_articles(settings: Settings) -> list[Article]:
     for item in results:
         fields = item.get("fields") or {}
         body = (fields.get("bodyText") or fields.get("trailText") or "").strip()
-        if not body:
+        title = fields.get("headline") or item.get("webTitle") or "Untitled"
+        url = item.get("webUrl") or ""
+        if not is_usable_article(title, url, body):
             continue
         articles.append(
             Article(
                 id=item.get("id") or item.get("webUrl") or fields.get("headline", ""),
-                title=fields.get("headline") or item.get("webTitle") or "Untitled",
-                url=item.get("webUrl") or "",
+                title=title,
+                url=url,
                 source="The Guardian",
                 published_at=item.get("webPublicationDate"),
                 body=body,
@@ -88,3 +91,18 @@ def load_sample_articles(path: str) -> list[Article]:
     with sample_path.open("r", encoding="utf-8") as file:
         raw_articles = json.load(file)
     return [Article.model_validate(item) for item in raw_articles]
+
+
+def is_usable_article(title: str, url: str, body: str) -> bool:
+    text = body.strip()
+    lowered_title = title.lower()
+    lowered_url = url.lower()
+    if len(text) < 600:
+        return False
+    if "/live/" in lowered_url or "live/" in lowered_url:
+        return False
+    if "as it happened" in lowered_title or "live updates" in lowered_title:
+        return False
+    if text.lower() in {"more coming up.", "more coming up"}:
+        return False
+    return True

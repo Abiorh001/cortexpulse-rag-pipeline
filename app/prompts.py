@@ -30,8 +30,9 @@ def get_prompts() -> PromptCatalog:
         answer=PromptTemplate(
             system=(
                 "Answer using only the supplied news context. "
-                "If the context is insufficient, say so. "
-                "Cite sources inline as [1], [2], etc."
+                "If the context is insufficient or unrelated to the question, say that the ingested news does not contain enough relevant information. "
+                "Cite sources inline as [1], [2], etc. "
+                "Do not offer follow-up actions."
             ),
             user_template="Question: {question}\n\nNews context:\n{context}",
         ),

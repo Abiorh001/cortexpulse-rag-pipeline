@@ -42,12 +42,42 @@ class QdrantStore:
             circuit_breaker=self.breaker,
         )
 
+    async def reset_collection(self, vector_size: int) -> None:
+        exists = await retry_with_backoff(
+            lambda: self.client.collection_exists(self.settings.qdrant_collection),
+            attempts=self.settings.retry_attempts,
+            initial_backoff_seconds=self.settings.retry_initial_backoff_seconds,
+            backoff_multiplier=self.settings.retry_backoff_multiplier,
+            circuit_breaker=self.breaker,
+        )
+        if exists:
+            await retry_with_backoff(
+                lambda: self.client.delete_collection(self.settings.qdrant_collection),
+                attempts=self.settings.retry_attempts,
+                initial_backoff_seconds=self.settings.retry_initial_backoff_seconds,
+                backoff_multiplier=self.settings.retry_backoff_multiplier,
+                circuit_breaker=self.breaker,
+            )
+        await retry_with_backoff(
+            lambda: self.client.create_collection(
+                collection_name=self.settings.qdrant_collection,
+                vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
+            ),
+            attempts=self.settings.retry_attempts,
+            initial_backoff_seconds=self.settings.retry_initial_backoff_seconds,
+            backoff_multiplier=self.settings.retry_backoff_multiplier,
+            circuit_breaker=self.breaker,
+        )
+
     async def upsert_chunks(
-        self, chunks: list[ArticleChunk], embeddings: list[list[float]]
+        self, chunks: list[ArticleChunk], embeddings: list[list[float]], *, reset: bool = False
     ) -> int:
         if not chunks:
             return 0
-        await self.ensure_collection(len(embeddings[0]))
+        if reset:
+            await self.reset_collection(len(embeddings[0]))
+        else:
+            await self.ensure_collection(len(embeddings[0]))
         points = []
         for chunk, embedding in zip(chunks, embeddings, strict=True):
             points.append(
@@ -100,6 +130,8 @@ class QdrantStore:
         citations: list[Citation] = []
         seen_urls: set[str] = set()
         for result in response.points:
+            if result.score is not None and result.score < self.settings.retrieval_score_threshold:
+                continue
             payload = result.payload or {}
             chunk = ArticleChunk.model_validate(payload)
             chunks.append(chunk)

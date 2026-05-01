@@ -43,6 +43,11 @@ function addMessage(role, text, citations = []) {
   messages.scrollTop = messages.scrollHeight;
 }
 
+function resetMessages(text) {
+  messages.innerHTML = "";
+  addMessage("assistant", text);
+}
+
 async function postJson(url, body = {}) {
   const response = await fetch(url, {
     method: "POST",
@@ -59,11 +64,14 @@ async function postJson(url, body = {}) {
 ingestButton.addEventListener("click", async () => {
   setBusy(true);
   setStatus("Ingesting and indexing news...");
+  resetMessages("Refreshing the vector store with the latest ingest...");
   try {
     const result = await postJson("/api/ingest");
     setStatus(`${result.message} Source: ${result.source}.`);
+    resetMessages("Ingest complete. Ask a question about the indexed article.");
   } catch (error) {
     setStatus(error.message, true);
+    resetMessages("Ingest failed. Check the status message above.");
   } finally {
     setBusy(false);
   }

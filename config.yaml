@@ -9,6 +9,7 @@ chunking:
 
 retrieval:
   top_k: 4
+  score_threshold: 0.3
   citation_snippet_chars: 260
 
 openai:

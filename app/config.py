@@ -16,6 +16,9 @@ def _flatten_config(data: dict[str, Any]) -> dict[str, Any]:
         "chunk_size": data.get("chunking", {}).get("chunk_size"),
         "chunk_overlap": data.get("chunking", {}).get("chunk_overlap"),
         "retrieval_top_k": data.get("retrieval", {}).get("top_k"),
+        "retrieval_score_threshold": data.get("retrieval", {}).get(
+            "score_threshold"
+        ),
         "citation_snippet_chars": data.get("retrieval", {}).get(
             "citation_snippet_chars"
         ),
@@ -124,6 +127,10 @@ class Settings(BaseSettings):
     retrieval_top_k: int = Field(
         default=YAML_DEFAULTS.get("retrieval_top_k", 4), alias="RETRIEVAL_TOP_K"
     )
+    retrieval_score_threshold: float = Field(
+        default=YAML_DEFAULTS.get("retrieval_score_threshold", 0.3),
+        alias="RETRIEVAL_SCORE_THRESHOLD",
+    )
     citation_snippet_chars: int = Field(
         default=YAML_DEFAULTS.get("citation_snippet_chars", 260),
         alias="CITATION_SNIPPET_CHARS",
@@ -164,6 +171,8 @@ class Settings(BaseSettings):
             raise ValueError("RETRY_ATTEMPTS must be at least 1")
         if self.contextualization_concurrency < 1:
             raise ValueError("CONTEXTUALIZATION_CONCURRENCY must be at least 1")
+        if not 0 <= self.retrieval_score_threshold <= 1:
+            raise ValueError("RETRIEVAL_SCORE_THRESHOLD must be between 0 and 1")
         return self
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

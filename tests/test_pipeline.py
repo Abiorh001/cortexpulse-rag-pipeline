@@ -19,8 +19,9 @@ class FakeStore:
     def __init__(self):
         self.indexed = []
 
-    async def upsert_chunks(self, chunks, embeddings):
+    async def upsert_chunks(self, chunks, embeddings, *, reset=False):
         self.indexed = chunks
+        self.reset = reset
         return len(chunks)
 
     async def search(self, query_embedding):

@@ -25,7 +25,11 @@ class CortexPulsePipeline:
             f"{chunk.contextual_text}\n\n{chunk.text}" for chunk in contextualized_chunks
         ]
         embeddings = await self.llm.embed_texts(texts_to_embed)
-        indexed = await self.store.upsert_chunks(contextualized_chunks, embeddings)
+        indexed = await self.store.upsert_chunks(
+            contextualized_chunks,
+            embeddings,
+            reset=True,
+        )
         return IngestResponse(
             source=source,
             articles_loaded=len(articles),
