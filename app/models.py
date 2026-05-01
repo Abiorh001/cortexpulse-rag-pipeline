@@ -28,6 +28,7 @@ class Citation(BaseModel):
     url: str
     source: str
     snippet: str
+    published: str | None = None
     score: float | None = None
 
 
@@ -48,6 +49,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
+    sources: list[Citation]
     citations: list[Citation]
 
 

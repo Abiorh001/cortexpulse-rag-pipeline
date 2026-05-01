@@ -150,6 +150,7 @@ class QdrantStore:
                     title=chunk.title,
                     url=chunk.url,
                     source=chunk.source,
+                    published=chunk.published_at,
                     snippet=chunk.text[: self.settings.citation_snippet_chars],
                     score=result.score,
                 )

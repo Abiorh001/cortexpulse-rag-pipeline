@@ -57,7 +57,7 @@ class CortexPulsePipeline:
             run_id=self.active_run_id,
         )
         answer = await self.llm.answer_question(question, chunks, citations)
-        return ChatResponse(answer=answer, citations=citations)
+        return ChatResponse(answer=answer, sources=citations, citations=citations)
 
     async def _contextualize_chunks(
         self, articles: list[Article], chunks: list[ArticleChunk]

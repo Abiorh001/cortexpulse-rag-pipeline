@@ -91,7 +91,7 @@ chatForm.addEventListener("submit", async (event) => {
   setBusy(true);
   try {
     const result = await postJson("/api/chat", { question });
-    addMessage("assistant", result.answer, result.citations);
+    addMessage("assistant", result.answer, result.sources || result.citations || []);
   } catch (error) {
     addMessage("assistant", error.message);
   } finally {

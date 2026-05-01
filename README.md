@@ -87,6 +87,32 @@ http://localhost:8000
 
 Click **Ingest news**, then ask a question.
 
+You can also test the API directly:
+
+```bash
+curl -X POST http://localhost:8000/api/ingest
+
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How is the Pentagon planning to use AI companies in the US military?"}'
+```
+
+The chat response includes a clean `sources` list:
+
+```json
+{
+  "answer": "...",
+  "sources": [
+    {
+      "title": "...",
+      "url": "...",
+      "source": "The Guardian",
+      "published": "..."
+    }
+  ]
+}
+```
+
 ## Configuration
 
 Key environment variables:
