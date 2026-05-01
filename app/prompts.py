@@ -1,9 +1,5 @@
-import os
 from functools import lru_cache
-from pathlib import Path
-from typing import Any
 
-import yaml
 from pydantic import BaseModel
 
 
@@ -19,7 +15,24 @@ class PromptCatalog(BaseModel):
 
 @lru_cache
 def get_prompts() -> PromptCatalog:
-    prompt_path = Path(os.getenv("CORTEXPULSE_PROMPTS", "prompts.yaml"))
-    with prompt_path.open("r", encoding="utf-8") as file:
-        data: dict[str, Any] = yaml.safe_load(file) or {}
-    return PromptCatalog.model_validate(data)
+    return PromptCatalog(
+        contextualize=PromptTemplate(
+            system="You write compact context that improves retrieval.",
+            user_template=(
+                "Give a concise retrieval context for the chunk below.\n"
+                "Explain what the chunk is about and how it fits into the article.\n"
+                "Use 2 short sentences maximum.\n\n"
+                "Article title: {title}\n"
+                "Article body excerpt:\n{article_excerpt}\n\n"
+                "Chunk:\n{chunk_text}"
+            ),
+        ),
+        answer=PromptTemplate(
+            system=(
+                "Answer using only the supplied news context. "
+                "If the context is insufficient, say so. "
+                "Cite sources inline as [1], [2], etc."
+            ),
+            user_template="Question: {question}\n\nNews context:\n{context}",
+        ),
+    )
