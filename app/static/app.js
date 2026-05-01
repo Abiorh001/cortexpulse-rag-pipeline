@@ -7,6 +7,7 @@ const questionInput = document.querySelector("#question");
 function setBusy(isBusy) {
   ingestButton.disabled = isBusy;
   chatForm.querySelector("button").disabled = isBusy;
+  ingestButton.textContent = isBusy ? "Ingesting..." : "Ingest news";
 }
 
 function setStatus(text, isError = false) {
@@ -62,13 +63,15 @@ async function postJson(url, body = {}) {
 }
 
 ingestButton.addEventListener("click", async () => {
+  const startedAt = new Date();
   setBusy(true);
-  setStatus("Ingesting and indexing news...");
+  setStatus(`Starting fresh ingest at ${startedAt.toLocaleTimeString()}...`);
   resetMessages("Refreshing the vector store with the latest ingest...");
   try {
     const result = await postJson("/api/ingest");
     const title = result.article_titles?.[0] ? ` Article: ${result.article_titles[0]}.` : "";
-    setStatus(`${result.message} Source: ${result.source}. Run: ${result.run_id}.${title}`);
+    const elapsed = ((Date.now() - startedAt.getTime()) / 1000).toFixed(1);
+    setStatus(`${result.message} Source: ${result.source}. Run: ${result.run_id}. Completed in ${elapsed}s at ${new Date(result.ingested_at).toLocaleTimeString()}.${title}`);
     resetMessages("Fresh ingest complete. Ask a question about the indexed article.");
   } catch (error) {
     setStatus(error.message, true);

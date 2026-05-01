@@ -37,6 +37,7 @@ class IngestResponse(BaseModel):
     chunks_indexed: int
     collection: str
     run_id: str
+    ingested_at: str
     article_titles: list[str]
     message: str
 

@@ -13,7 +13,7 @@ The primary data source is the Guardian Open Platform. If the API is unavailable
 - Embeds and stores chunks with metadata in Qdrant.
 - Exposes `/api/ingest` and `/api/chat` endpoints.
 - Returns answers grounded in retrieved content with source attribution.
-- Rebuilds the vector collection on each ingest and tags chunks with a fresh run ID so chat only searches the latest run.
+- Rebuilds the vector collection on each ingest and tags chunks with a fresh run ID/timestamp so chat only searches the latest run.
 
 ## How It Works
 

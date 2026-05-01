@@ -1,5 +1,6 @@
 from collections import defaultdict
 import asyncio
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.chunking import split_articles
@@ -43,6 +44,7 @@ class CortexPulsePipeline:
             chunks_indexed=indexed,
             collection=self.settings.qdrant_collection,
             run_id=run_id,
+            ingested_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
             article_titles=[article.title for article in articles],
             message=f"Rebuilt {self.settings.qdrant_collection} with {indexed} chunks from {len(articles)} article(s).",
         )
