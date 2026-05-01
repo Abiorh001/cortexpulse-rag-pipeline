@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CortexPulse</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Synapse AI Assessment</p>
+            <h1>CortexPulse</h1>
+            <p class="subtitle">Ask concise questions against the ingested news corpus.</p>
+          </div>
+          <button id="ingestButton" type="button">Ingest news</button>
+        </header>
+
+        <div id="status" class="status">Ready to ingest articles.</div>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <article class="message assistant">
+            Ask a question after ingesting news. Answers will include source links.
+          </article>
+        </section>
+
+        <form id="chatForm" class="composer">
+          <input
+            id="question"
+            name="question"
+            type="text"
+            placeholder="Ask about the ingested news..."
+            autocomplete="off"
+            required
+            minlength="3"
+          />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

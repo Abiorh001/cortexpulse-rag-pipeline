@@ -1,0 +1,33 @@
+news:
+  guardian_query: artificial intelligence
+  max_articles: 1
+  sample_articles_path: data/sample_articles.json
+
+chunking:
+  chunk_size: 400
+  chunk_overlap: 200
+
+retrieval:
+  top_k: 4
+  citation_snippet_chars: 260
+
+openai:
+  chat_model: gpt-4o-mini
+  embedding_model: text-embedding-3-small
+  contextualization_enabled: false
+  answer_temperature: 0.2
+  contextualize_temperature: 0.0
+  max_article_context_chars: 6000
+  contextualization_concurrency: 2
+
+qdrant:
+  url: http://localhost:6333
+  collection: cortexpulse_news
+
+resilience:
+  request_timeout_seconds: 20
+  retry_attempts: 3
+  retry_initial_backoff_seconds: 0.75
+  retry_backoff_multiplier: 2.0
+  circuit_breaker_failure_threshold: 3
+  circuit_breaker_reset_seconds: 30

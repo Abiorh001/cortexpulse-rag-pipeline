@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sample-ai-hospitals",
+    "title": "Hospitals test AI tools to prioritize urgent patient messages",
+    "url": "local://sample_articles/sample-ai-hospitals",
+    "source": "Bundled fallback sample",
+    "published_at": "2026-05-01T08:00:00Z",
+    "body": "Several hospital networks are piloting artificial intelligence systems that help clinical teams sort patient messages by urgency. The tools read incoming portal messages, identify symptoms that may require faster review, and route routine administrative requests to support staff. Clinicians said the systems are useful only when they keep humans in control and provide clear explanations for why a message was flagged. Patient safety teams are monitoring false positives and false negatives before expanding the systems across more departments."
+  },
+  {
+    "id": "sample-energy-grid",
+    "title": "Grid operators use forecasting models to balance renewable energy",
+    "url": "local://sample_articles/sample-energy-grid",
+    "source": "Bundled fallback sample",
+    "published_at": "2026-05-01T09:30:00Z",
+    "body": "Regional grid operators are adopting machine learning forecasts to predict solar and wind generation more accurately. Better short-term forecasts help operators decide when to store power, dispatch backup generation, or shift demand. Energy analysts said the models are most valuable when combined with weather data, sensor readings, and human operational judgment. The main challenge is resilience during storms, when historical patterns may not match current conditions."
+  },
+  {
+    "id": "sample-election-integrity",
+    "title": "Newsrooms prepare verification workflows for election misinformation",
+    "url": "local://sample_articles/sample-election-integrity",
+    "source": "Bundled fallback sample",
+    "published_at": "2026-05-01T10:15:00Z",
+    "body": "News organizations are building faster verification workflows ahead of major elections. Editors are combining public records, image forensics, and source databases to check viral claims before publication. Several teams are also using retrieval systems to surface prior reporting and official statements when a new claim appears online. Media researchers warned that speed should not replace careful attribution, especially when synthetic images or clipped videos are involved."
+  }
+]
