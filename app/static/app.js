@@ -67,8 +67,9 @@ ingestButton.addEventListener("click", async () => {
   resetMessages("Refreshing the vector store with the latest ingest...");
   try {
     const result = await postJson("/api/ingest");
-    setStatus(`${result.message} Source: ${result.source}.`);
-    resetMessages("Ingest complete. Ask a question about the indexed article.");
+    const title = result.article_titles?.[0] ? ` Article: ${result.article_titles[0]}.` : "";
+    setStatus(`${result.message} Source: ${result.source}. Run: ${result.run_id}.${title}`);
+    resetMessages("Fresh ingest complete. Ask a question about the indexed article.");
   } catch (error) {
     setStatus(error.message, true);
     resetMessages("Ingest failed. Check the status message above.");

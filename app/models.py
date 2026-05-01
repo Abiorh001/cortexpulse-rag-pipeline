@@ -12,6 +12,7 @@ class Article(BaseModel):
 
 class ArticleChunk(BaseModel):
     id: str
+    run_id: str | None = None
     article_id: str
     title: str
     url: str
@@ -34,6 +35,9 @@ class IngestResponse(BaseModel):
     source: str
     articles_loaded: int
     chunks_indexed: int
+    collection: str
+    run_id: str
+    article_titles: list[str]
     message: str
 
 

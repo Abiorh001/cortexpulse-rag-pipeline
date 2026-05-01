@@ -1,5 +1,6 @@
 from collections import defaultdict
 import asyncio
+from uuid import uuid4
 
 from app.chunking import split_articles
 from app.config import Settings
@@ -14,10 +15,15 @@ class CortexPulsePipeline:
         self.settings = settings
         self.llm = OpenAIService(settings)
         self.store = QdrantStore(settings)
+        self.active_run_id: str | None = None
 
     async def ingest(self) -> IngestResponse:
+        run_id = uuid4().hex[:12]
         source, articles = await load_articles(self.settings)
-        chunks = split_articles(articles, self.settings)
+        chunks = [
+            chunk.model_copy(update={"run_id": run_id})
+            for chunk in split_articles(articles, self.settings)
+        ]
         contextualized_chunks = chunks
         if self.settings.contextualization_enabled:
             contextualized_chunks = await self._contextualize_chunks(articles, chunks)
@@ -30,11 +36,15 @@ class CortexPulsePipeline:
             embeddings,
             reset=True,
         )
+        self.active_run_id = run_id
         return IngestResponse(
             source=source,
             articles_loaded=len(articles),
             chunks_indexed=indexed,
-            message=f"Indexed {indexed} chunks from {len(articles)} article(s).",
+            collection=self.settings.qdrant_collection,
+            run_id=run_id,
+            article_titles=[article.title for article in articles],
+            message=f"Rebuilt {self.settings.qdrant_collection} with {indexed} chunks from {len(articles)} article(s).",
         )
 
     async def chat(self, question: str) -> ChatResponse:
@@ -42,6 +52,7 @@ class CortexPulsePipeline:
         chunks, citations = await self.store.search(
             query_embedding,
             limit=self.settings.retrieval_top_k,
+            run_id=self.active_run_id,
         )
         answer = await self.llm.answer_question(question, chunks, citations)
         return ChatResponse(answer=answer, citations=citations)

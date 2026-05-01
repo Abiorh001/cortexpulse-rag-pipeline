@@ -1,5 +1,5 @@
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.http.models import Distance
+from qdrant_client.http.models import Distance, FieldCondition, Filter, MatchValue
 from qdrant_client.models import PointStruct, VectorParams
 
 from app.config import Settings
@@ -101,7 +101,7 @@ class QdrantStore:
         return len(points)
 
     async def search(
-        self, query_embedding: list[float], limit: int = 4
+        self, query_embedding: list[float], limit: int = 4, run_id: str | None = None
     ) -> tuple[list[ArticleChunk], list[Citation]]:
         exists = await retry_with_backoff(
             lambda: self.client.collection_exists(self.settings.qdrant_collection),
@@ -113,10 +113,17 @@ class QdrantStore:
         if not exists:
             return [], []
 
+        query_filter = None
+        if run_id:
+            query_filter = Filter(
+                must=[FieldCondition(key="run_id", match=MatchValue(value=run_id))]
+            )
+
         response = await retry_with_backoff(
             lambda: self.client.query_points(
                 collection_name=self.settings.qdrant_collection,
                 query=query_embedding,
+                query_filter=query_filter,
                 limit=limit,
                 with_payload=True,
             ),

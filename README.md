@@ -13,7 +13,7 @@ The primary data source is the Guardian Open Platform. If the API is unavailable
 - Embeds and stores chunks with metadata in Qdrant.
 - Exposes `/api/ingest` and `/api/chat` endpoints.
 - Returns answers grounded in retrieved content with source attribution.
-- Rebuilds the vector collection on each ingest so the demo reflects the latest run.
+- Rebuilds the vector collection on each ingest and tags chunks with a fresh run ID so chat only searches the latest run.
 
 ## How It Works
 
@@ -29,7 +29,7 @@ The primary data source is the Guardian Open Platform. If the API is unavailable
 
 - Embeds chunks using `text-embedding-3-small`.
 - Stores vectors in Qdrant with title, URL, source, timestamp, and chunk text.
-- Resets the Qdrant collection during ingest to avoid mixing old and new runs.
+- Resets the `cortexpulse_news` Qdrant collection during ingest to avoid mixing old and new runs.
 
 ### 3. Retrieval And Answering
 
@@ -110,7 +110,7 @@ Non-secret defaults live in `config.yaml`. Environment variables override them.
 - **Guardian API + fallback data**: satisfies the public news source requirement while keeping the demo reliable without a news API key.
 - **Qdrant**: lightweight local vector database that runs cleanly through Docker Compose.
 - **OpenAI embeddings and generation**: keeps the implementation small and easy to run.
-- **Collection reset on ingest**: each UI ingest reflects a fresh pipeline run instead of reusing stale vectors.
+- **Collection reset + run ID on ingest**: each UI ingest reflects a fresh pipeline run instead of reusing stale vectors.
 - **No hybrid search or reranker by default**: intentionally excluded to keep the system aligned with the lightweight assessment brief.
 - **Contextual chunk enrichment is optional**: the hook exists via `CONTEXTUALIZATION_ENABLED=true`, but the default path is faster and more predictable for a timed demo.
 
